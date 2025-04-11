@@ -38,7 +38,7 @@ vector<int> stripNonNums(const string& line) {
     result.push_back(rightInt);
     return result;
 }
-void TEST_printConnections(vector<int> adjacencyList[26]) {
+void TEST_printConnections(vector<int> adjacencyList[NUM_NODES]) {
     cout << endl<< endl<< endl;
     for (int i = 0; i < NUM_NODES; i++) {
         cout << i << ": ";
