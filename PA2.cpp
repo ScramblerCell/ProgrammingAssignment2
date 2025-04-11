@@ -38,17 +38,17 @@ vector<int> stripNonNums(const string& line) {
     result.push_back(rightInt);
     return result;
 }
-void TEST_printConnections(vector<int> adj[26]) {
+void TEST_printConnections(vector<int> adjacencyList[26]) {
     cout << endl<< endl<< endl;
     for (int i = 0; i < NUM_NODES; i++) {
         cout << i << ": ";
-        for (int node : adj[i]) {
+        for (int node : adjacencyList[i]) {
             cout << node << " ";
         }
         cout << endl;
     }
 }
-void updateDistOfDFS(int start, int target, vector<int> adj[], vector<bool>& isVisited, int& currDist, bool& found) {
+void updateDistOfDFS(int start, int target, vector<int> adjacencyList[], vector<bool>& isVisited, int& currDist, bool& found) {
     if (found) return;
     
     //init start node as visited
@@ -59,13 +59,13 @@ void updateDistOfDFS(int start, int target, vector<int> adj[], vector<bool>& isV
     }   
     currDist++;
     //depth first search 
-    for (auto neighb : adj[start]) {//for each neighbor of start
+    for (auto neighb : adjacencyList[start]) {//for each neighbor of start
         if (!isVisited.at(neighb)) {//if neighbor hasn't been visited
-            updateDistOfDFS(neighb, target, adj, isVisited, currDist, found);//do dfs on it
+            updateDistOfDFS(neighb, target, adjacencyList, isVisited, currDist, found);//do dfs on it
         }
     }
 }
-void updateDistOfBFS(int start, int target, vector<int> adj[], vector<bool>& isVisited, int& currDist) {
+void updateDistOfBFS(int start, int target, vector<int> adjacencyList[], vector<bool>& isVisited, int& currDist) {
     queue<int> bfsQueue;
     bfsQueue.push(start);
     isVisited[start] = true;
@@ -77,7 +77,7 @@ void updateDistOfBFS(int start, int target, vector<int> adj[], vector<bool>& isV
 
         if (currNode == target) return;
 
-        for (int neighb : adj[currNode]) {
+        for (int neighb : adjacencyList[currNode]) {
             if (!isVisited[neighb]) {
                 isVisited[neighb] = true;
                 bfsQueue.push(neighb);
@@ -89,7 +89,7 @@ void updateDistOfBFS(int start, int target, vector<int> adj[], vector<bool>& isV
 
     // If target is not found, optionally set currDist to -1 or total nodes visited
 }
-pair<int, double> trackSearchAlgo(bool isDFS,int start, int target, vector<int> adj[]) {
+pair<int, double> trackSearchAlgo(bool isDFS,int start, int target, vector<int> adjacencyList[]) {
     int currDist = 0;
     double currTime_ms = 0;
     //init visited vector
@@ -100,8 +100,8 @@ pair<int, double> trackSearchAlgo(bool isDFS,int start, int target, vector<int> 
     
     //run search algo to get distance
     bool found = false;
-    if (isDFS) updateDistOfDFS(start, target, adj, isVisited, currDist, found);
-    else updateDistOfBFS(start, target, adj, isVisited, currDist);
+    if (isDFS) updateDistOfDFS(start, target, adjacencyList, isVisited, currDist, found);
+    else updateDistOfBFS(start, target, adjacencyList, isVisited, currDist);
     
     //end timeer
     auto current_time = std::chrono::high_resolution_clock::now();
@@ -132,25 +132,24 @@ void printRun(int row, int DFS_dist, double DFS_time, int BFS_dist, double BFS_t
 
 
 int main() {
+    vector<int> adjacencyList[NUM_NODES];
     string testLine;
     vector<int> strippedInts;
     ifstream csvFile(FILE_TO_READ); 
     //read and write csvFile into graph
     while (getline(csvFile, testLine)) {
         strippedInts =  stripNonNums(testLine);
-        adj[strippedInts[0]].push_back(strippedInts[1]);
+        adjacencyList[strippedInts[0]].push_back(strippedInts[1]);
     }
    
     printHeader();
-
-    vector<int> adj[NUM_NODES];
     //do search from 0 to 9 for testing
     for (int i = 1; i < NUM_NODES-1; i++) {
-        pair<int, double> DFS_data = trackSearchAlgo(true, 0, i, adj);
-        pair<int, double> BFS_data = trackSearchAlgo(false, 0, i, adj);
+        pair<int, double> DFS_data = trackSearchAlgo(true, 0, i, adjacencyList);
+        pair<int, double> BFS_data = trackSearchAlgo(false, 0, i, adjacencyList);
         printRun(i, DFS_data.first, DFS_data.second, BFS_data.first, BFS_data.second);
     }
     printLine();
 
-    //TEST_printConnections(adj);
+    //TEST_printConnections(adjacencyList);
 }
