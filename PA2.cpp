@@ -66,29 +66,28 @@ void updateDistOfDFS(int start, int target, vector<int> adj[], vector<bool>& isV
     }
 }
 void updateDistOfBFS(int start, int target, vector<int> adj[], vector<bool>& isVisited, int& currDist) {
-    queue<pair<int, int> > bfsQueue; // pair<node, distance>
-    bfsQueue.push(make_pair(start, 0));
+    queue<int> bfsQueue;
+    bfsQueue.push(start);
     isVisited[start] = true;
+    currDist = 1; // We count the start node as the first visited
 
     while (!bfsQueue.empty()) {
-        int currNode = bfsQueue.front().first;
-        int currLevel = bfsQueue.front().second;
+        int currNode = bfsQueue.front();
         bfsQueue.pop();
-        //quit if target found
-        if (currNode == target) {
-            currDist = currLevel;
-            return;
-        }
+
+        if (currNode == target) return;
 
         for (int neighb : adj[currNode]) {
             if (!isVisited[neighb]) {
                 isVisited[neighb] = true;
-                bfsQueue.push(make_pair(neighb, currLevel + 1));
+                bfsQueue.push(neighb);
+                if (neighb == target) return;
+                currDist++; // We increment when a node is marked visited
             }
         }
     }
 
-    currDist = -1; // if unreachable
+    // If target is not found, optionally set currDist to -1 or total nodes visited
 }
 pair<int, double> trackSearchAlgo(bool isDFS,int start, int target, vector<int> adj[]) {
     int currDist = 0;
@@ -135,16 +134,17 @@ void printRun(int row, int DFS_dist, double DFS_time, int BFS_dist, double BFS_t
 int main() {
     string testLine;
     vector<int> strippedInts;
-    ifstream csvFile(FILE_TO_READ);
-    vector<int> adj[NUM_NODES]; 
-
+    ifstream csvFile(FILE_TO_READ); 
     //read and write csvFile into graph
     while (getline(csvFile, testLine)) {
         strippedInts =  stripNonNums(testLine);
         adj[strippedInts[0]].push_back(strippedInts[1]);
     }
+   
     printHeader();
-    //do dfs from 0 to 9 for testing
+
+    vector<int> adj[NUM_NODES];
+    //do search from 0 to 9 for testing
     for (int i = 1; i < NUM_NODES-1; i++) {
         pair<int, double> DFS_data = trackSearchAlgo(true, 0, i, adj);
         pair<int, double> BFS_data = trackSearchAlgo(false, 0, i, adj);
@@ -153,6 +153,4 @@ int main() {
     printLine();
 
     //TEST_printConnections(adj);
-
-    return 1;
 }
